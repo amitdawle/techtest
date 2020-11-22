@@ -37,13 +37,11 @@ public class ServerImpl implements Server {
     private final DataBodyService dataBodyServiceImpl;
     private final ModelMapper modelMapper;
     private final DataLakeRestGateway dataLakeRestGateway;
-    private final int RETRY_TIMES = 5;
     /**
      * @param envelope
      * @return true if there is a match with the client provided checksum.
      */
     @Override
-    @Retryable(value = ServerException.class, maxAttempts = RETRY_TIMES, backoff = @Backoff(delay = 1000))
     public boolean saveDataEnvelope(DataEnvelope envelope) {
 
         try {
@@ -66,7 +64,7 @@ public class ServerImpl implements Server {
                 throw new ServerException("Failed to push data to datalake.");
             }
         } catch (DataLakeException e){
-            log.error("Exception in accessing the resource, will attempt to retry until max retries is reached. ", e);
+            log.error("Exception in accessing the data lake. ", e);
             throw new ServerException(e);
         }
         log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
