@@ -3,7 +3,7 @@ package com.db.dataplatform.techtest.server.component.impl;
 import com.db.dataplatform.techtest.server.api.model.DataBody;
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
 import com.db.dataplatform.techtest.server.api.model.DataHeader;
-import com.db.dataplatform.techtest.server.component.DataLakeRestGateway;
+import com.db.dataplatform.techtest.server.component.DataLakeGateway;
 import com.db.dataplatform.techtest.server.exception.DataLakeException;
 import com.db.dataplatform.techtest.server.exception.ServerException;
 import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
@@ -13,18 +13,13 @@ import com.db.dataplatform.techtest.server.service.DataBodyService;
 import com.db.dataplatform.techtest.server.component.Server;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import javax.transaction.Transactional;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +31,7 @@ public class ServerImpl implements Server {
 
     private final DataBodyService dataBodyServiceImpl;
     private final ModelMapper modelMapper;
-    private final DataLakeRestGateway dataLakeRestGateway;
+    private final DataLakeGateway dataLakeGateway;
     /**
      * @param envelope
      * @return true if there is a match with the client provided checksum.
@@ -59,7 +54,7 @@ public class ServerImpl implements Server {
             // Save to persistence.
             persist(envelope);
 
-            if (!dataLakeRestGateway.pushData(envelope.getDataBody().getDataBody())) {
+            if (!dataLakeGateway.pushData(envelope.getDataBody().getDataBody())) {
                 log.warn("Failed to push data to the data lake");
                 throw new ServerException("Failed to push data to datalake.");
             }

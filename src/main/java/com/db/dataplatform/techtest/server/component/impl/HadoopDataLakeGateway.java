@@ -1,8 +1,7 @@
 package com.db.dataplatform.techtest.server.component.impl;
 
-import com.db.dataplatform.techtest.server.component.DataLakeRestGateway;
+import com.db.dataplatform.techtest.server.component.DataLakeGateway;
 import com.db.dataplatform.techtest.server.exception.DataLakeException;
-import com.db.dataplatform.techtest.server.exception.ServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplate;
 
@@ -22,12 +22,12 @@ import static java.lang.String.format;
 
 @Slf4j
 @Service
-public class HadoopDataLakeGateway implements DataLakeRestGateway {
+public class HadoopDataLakeGateway implements DataLakeGateway {
 
     private static final UriTemplate URI_PUSHDATA = new UriTemplate("http://localhost:8090/hadoopserver/pushbigdata");
 
     private static final int MAX_WAIT_MILLIS = 5000;
-    private final int RETRY_TIMES = 5;
+    private final int RETRY_TIMES = 10;
 
 
     private final RestTemplate restTemplate;
@@ -53,9 +53,9 @@ public class HadoopDataLakeGateway implements DataLakeRestGateway {
                 log.warn("Push returned {}", responseEntity.getStatusCode());
                 return false;
             }
-        } catch (Exception e) {
+        } catch (HttpServerErrorException e) {
             log.error(format("Exception in accessing the data lake, " +
-                    "will attempt to retry until max retries is reached. The error was %s.", e.getMessage()));
+                    "will attempt to retry until max retries is reached. The return code was %s.", e.getStatusCode()));
             throw new DataLakeException(e);
         }
         log.info("Push was successful.");

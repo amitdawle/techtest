@@ -1,7 +1,7 @@
 package com.db.dataplatform.techtest.service;
 
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
-import com.db.dataplatform.techtest.server.component.DataLakeRestGateway;
+import com.db.dataplatform.techtest.server.component.DataLakeGateway;
 import com.db.dataplatform.techtest.server.component.Server;
 import com.db.dataplatform.techtest.server.component.impl.ServerImpl;
 import com.db.dataplatform.techtest.server.exception.DataLakeException;
@@ -34,7 +34,7 @@ public class ServerServiceTests {
     private DataBodyService dataBodyServiceImplMock;
 
     @Mock
-    private DataLakeRestGateway dataLakeRestGateway;
+    private DataLakeGateway dataLakeGateway;
 
     private ModelMapper modelMapper;
 
@@ -52,9 +52,9 @@ public class ServerServiceTests {
         expectedDataBodyEntity = modelMapper.map(testDataEnvelope.getDataBody(), DataBodyEntity.class);
         expectedDataBodyEntity.setDataHeaderEntity(modelMapper.map(testDataEnvelope.getDataHeader(), DataHeaderEntity.class));
 
-        when(dataLakeRestGateway.pushData(anyString())).thenReturn(true);
+        when(dataLakeGateway.pushData(anyString())).thenReturn(true);
 
-        server = new ServerImpl(dataBodyServiceImplMock, modelMapper, dataLakeRestGateway);
+        server = new ServerImpl(dataBodyServiceImplMock, modelMapper, dataLakeGateway);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ServerServiceTests {
         assertThat(success).isTrue();
 
         verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
-        verify(dataLakeRestGateway, times(1)).pushData(expectedDataBodyEntity.getDataBody());
+        verify(dataLakeGateway, times(1)).pushData(expectedDataBodyEntity.getDataBody());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ServerServiceTests {
         testDataEnvelope.getDataBody().setMd5Checksum("CECFD3953783DF706878AAEC2C22AA70");
         DataBodyEntity expectedDataBodyEntity = modelMapper.map(testDataEnvelope.getDataBody(), DataBodyEntity.class);
         expectedDataBodyEntity.setDataHeaderEntity(modelMapper.map(testDataEnvelope.getDataHeader(), DataHeaderEntity.class));
-        when(dataLakeRestGateway.pushData(anyString())).thenReturn(false);
+        when(dataLakeGateway.pushData(anyString())).thenReturn(false);
 
         assertThatThrownBy(() -> server.saveDataEnvelope(testDataEnvelope)).isInstanceOf(ServerException.class);
     }
@@ -97,7 +97,7 @@ public class ServerServiceTests {
         testDataEnvelope.getDataBody().setMd5Checksum("CECFD3953783DF706878AAEC2C22AA70");
         DataBodyEntity expectedDataBodyEntity = modelMapper.map(testDataEnvelope.getDataBody(), DataBodyEntity.class);
         expectedDataBodyEntity.setDataHeaderEntity(modelMapper.map(testDataEnvelope.getDataHeader(), DataHeaderEntity.class));
-        when(dataLakeRestGateway.pushData(anyString())).thenThrow(new DataLakeException(new Exception("Unavailable")));
+        when(dataLakeGateway.pushData(anyString())).thenThrow(new DataLakeException(new Exception("Unavailable")));
 
         assertThatThrownBy(() -> server.saveDataEnvelope(testDataEnvelope)).isInstanceOf(ServerException.class);
     }
