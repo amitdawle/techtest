@@ -44,7 +44,6 @@ public class ServerController {
 
 
     @GetMapping(value = "/data/{blockType}", produces = MediaType.APPLICATION_JSON_VALUE)
-    //@PathVariable(value = "type") QuestionCategory categor
     public ResponseEntity<List<DataEnvelope>> getDataByBlockType(@PathVariable(value = "blockType") BlockTypeEnum blockType) throws IOException {
         Objects.requireNonNull(blockType);
         log.info("Request received to query data for block type {}", blockType);
