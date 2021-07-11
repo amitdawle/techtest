@@ -1,6 +1,6 @@
 # techtest
 
-One of the strangest assignment I have ever received for a tech test, 60+ files for a 1 hour submission, too many libraries, archaic application design, and strange expectations (testing generated code). If were to ever test a candidate using this as a template, I would rather pair with them to guide them and see how they approach the problem. 
+One of the strangest assignment I have ever received for a tech test; It had 60+ files for a 1 hour submission, too many libraries, archaic application design, and strange expectations (testing generated code). If were to ever test a candidate using this as a template, I would rather pair with them to guide them and see how they approach the problem. 
 
  
 #### Notes
